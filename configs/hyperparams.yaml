@@ -1,0 +1,6 @@
+output_dir: data/
+
+brs: Nasdaq
+
+to_fetch: True # False - load previously saved data
+fetch_date: '2023-09-05'

@@ -8,7 +8,7 @@
             "name": "Fetch BRS Data",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceRoot}/brs/main.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
