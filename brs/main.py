@@ -12,21 +12,31 @@ from datetime import date, datetime
 sys.path.append(str(Path().resolve()))
 
 from brs.fetch_utils import get_args, get_hyperparams
-#from brs.fetcher import BrsFetcher
+from brs.fetcher import BrsFetcher
 
 def main():
     start_time = datetime.now()
     print(f'Execution started at ', start_time)
-    # 1. preparations
+    # 1. preparations (parameters definition)
     args = get_args()
     hyperparams = get_hyperparams(Path('configs', args.hyperparams_path))
+    
+    
 
     # 2. fetch or load data
     df = pd.DataFrame()
     if hyperparams.to_fetch:  # fetch data from brs API
-        #fetcher = BrsFetcher(hyperparams)
-        #df = fetcher.fetch()
-        print('fetch finished')
+ 
+        # Fetch historical data
+        fetcher_historical = BrsFetcher(instrument_list=hyperparams.instruments, api_resource_list=hyperparams.apis, data_type="historical", period=hyperparams.historical_params['period'], interval=hyperparams.historical_params['interval'])
+        df = fetcher_historical.fetch_data()
+        df.to_csv('df.csv')
+
+        # Fetch real-time data
+        fetcher_real_time = BrsFetcher(instrument_list=hyperparams.instruments, api_resource_list=hyperparams.apis, data_type="real_time")
+        df_online = fetcher_real_time.fetch_data()
+        df_online.to_csv('df_online.csv')
+
     else:  # load
         print(
             f'The previously fetched data was loaded from the dataset dated {hyperparams.fetch_date}')

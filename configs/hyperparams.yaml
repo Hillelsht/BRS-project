@@ -1,6 +1,11 @@
 output_dir: data/
 
-brs: Nasdaq
+apis: [YahooBursaFetcher]
+instruments: ["SPY", "AAPL", "GLD", "EURUSD=X", "EEM"]
 
 to_fetch: True # False - load previously saved data
 fetch_date: '2023-09-05'
+
+historical_params:
+  period: "1y"
+  interval: "1d"

@@ -7,6 +7,7 @@ import argparse
 from pydantic import BaseModel, validator
 from pathlib import Path
 from brs.utils import read_yaml
+from typing import Any
 
 
 def get_args() -> argparse.Namespace:
@@ -26,9 +27,11 @@ class Hyperparams(BaseModel):
     """
 
     output_dir: str
-    brs: str
+    apis: list
+    instruments: list
     to_fetch: bool
     fetch_date: str
+    historical_params: Any
 
 
 def get_hyperparams(file_path: Path) -> Hyperparams:
