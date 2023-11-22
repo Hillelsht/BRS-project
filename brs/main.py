@@ -21,7 +21,6 @@ def main():
     args = get_args()
     hyperparams = get_hyperparams(Path('configs', args.hyperparams_path))
     
-    
 
     # 2. fetch or load data
     df = pd.DataFrame()

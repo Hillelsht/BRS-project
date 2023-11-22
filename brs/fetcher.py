@@ -45,5 +45,5 @@ class BrsFetcher:
                 real_time_df['Instrument'] = real_time_df['index']
                 all_data_for_all_apis.append(real_time_df.drop('index', axis=1))
 
-        return all_data_for_all_apis if len(all_data_for_all_apis) > 1 else all_data_for_all_apis[0]
+        return pd.concat(all_data_for_all_apis, ignore_index=True) if len(all_data_for_all_apis) > 1 else all_data_for_all_apis[0]
 
