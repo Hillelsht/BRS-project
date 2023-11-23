@@ -1,4 +1,7 @@
 from typing import Type, List, Any, Union
+from pathlib import Path
+from datetime import datetime, date
+
 import pandas as pd
 
 from API_bursas import *
@@ -7,16 +10,17 @@ from API_bursas import *
 
 class BrsFetcher:
     def __init__(self, 
-                 instrument_list: List[str], 
-                 api_resource_list: List[str], 
-                 data_type: str = "historical", 
-                 period: str = "1y", 
-                 interval: str = "1d"):
-        self.instrument_list = instrument_list
-        self.api_resource_list = api_resource_list
+                 hyperparams: dict, 
+                 data_type: str = "historical"):
         self.data_type = data_type
-        self.period = period
-        self.interval = interval
+        self.instrument_list = hyperparams.instruments
+        self.api_resource_list=hyperparams.apis
+        self.period=hyperparams.historical_params['period']
+        self.interval=hyperparams.historical_params['interval']
+        # set output directory
+        self.output_dir = Path(
+            hyperparams.output_dir, 'fetch', f"fetch_{date.today()}")
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
     def fetch_data(self) -> Union[pd.DataFrame, List[pd.DataFrame]]:
         all_data_for_all_apis = []
@@ -26,10 +30,11 @@ class BrsFetcher:
             merged_data = []
             
             if self.data_type == "historical":
-                for symbol in self.instrument_list:
+                for symbol, market in self.instrument_list.items():
                     finance_data = api_resource(symbol, self.period, self.interval)
                     data = finance_data.get_historical_data()
                     data['Instrument'] = symbol
+                    data['Market'] = market
                     data.reset_index(inplace=True)
                     merged_data.append(data)
 
@@ -47,3 +52,6 @@ class BrsFetcher:
 
         return pd.concat(all_data_for_all_apis, ignore_index=True) if len(all_data_for_all_apis) > 1 else all_data_for_all_apis[0]
 
+    def save_data(self, df: pd.DataFrame):
+        df.to_csv(Path(self.output_dir, 'df.csv'))
+        df.to_parquet(Path(self.output_dir, 'df.parquet'))

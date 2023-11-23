@@ -4,6 +4,7 @@
 ########################
 
 import argparse
+import pandas as pd
 from pydantic import BaseModel, validator
 from pathlib import Path
 from brs.utils import read_yaml
@@ -28,7 +29,7 @@ class Hyperparams(BaseModel):
 
     output_dir: str
     apis: list
-    instruments: list
+    instruments: dict
     to_fetch: bool
     fetch_date: str
     historical_params: Any

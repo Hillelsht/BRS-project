@@ -27,14 +27,14 @@ def main():
     if hyperparams.to_fetch:  # fetch data from brs API
  
         # Fetch historical data
-        fetcher_historical = BrsFetcher(instrument_list=hyperparams.instruments, api_resource_list=hyperparams.apis, data_type="historical", period=hyperparams.historical_params['period'], interval=hyperparams.historical_params['interval'])
+        fetcher_historical = BrsFetcher(hyperparams, data_type="historical")
         df = fetcher_historical.fetch_data()
-        df.to_csv('df.csv')
-
-        # Fetch real-time data
-        fetcher_real_time = BrsFetcher(instrument_list=hyperparams.instruments, api_resource_list=hyperparams.apis, data_type="real_time")
-        df_online = fetcher_real_time.fetch_data()
-        df_online.to_csv('df_online.csv')
+        fetcher_historical.save_data(df)
+        
+        # Fetch real-time data (online fetcher is temporary unavailable due to API provider issues)
+        fetcher_real_time = BrsFetcher(hyperparams, data_type="real_time")
+        #df_real_time = fetcher_real_time.fetch_data()
+        #fetcher_historical.save_data(df_real_time)
 
     else:  # load
         print(

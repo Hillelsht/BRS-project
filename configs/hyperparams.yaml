@@ -1,15 +1,20 @@
 output_dir: data/
 
 apis: [YahooBursaFetcher]
-instruments: ["SPY", "AAPL", "GLD", "EURUSD=X", "EEM"]
+instruments: # instrument: market
+  SPY: NYSE Arca 
+  AAPL: NASDAQ
+  GLD: NYSE Arca
+  EURUSD=X: FX
+  EEM: NYSE Arca
 
 # fetching parameters
 to_fetch: True # False - load previously saved data
 fetch_date: '2023-10-17'
 
 historical_params:
-  period: "1y"
-  interval: "1d"
+  period: "1y" # "1y" "60d"
+  interval: "1h" # "1d"
 
 # preprocessing parameters
 to_preprocess: True # False - load previously saved data
