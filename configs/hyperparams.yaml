@@ -8,6 +8,9 @@ instruments: # instrument: market
   EURUSD=X: FX
   EEM: NYSE Arca
 
+features_list: ['Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits', 'Capital Gains', 'Instrument', 'Market', 'day_of_week', 'month', 'hour', 'MA_5', 'MA_10', 'Close_pct_change', 'Volume_pct_change']
+
+
 # fetching parameters
 to_fetch: True # False - load previously saved data
 fetch_date: '2023-10-17'
@@ -18,3 +21,7 @@ historical_params:
 
 # preprocessing parameters
 to_preprocess: True # False - load previously saved data
+
+labeling:
+  to_label: True
+  label_date: '2023-10-17'

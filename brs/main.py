@@ -13,10 +13,14 @@ sys.path.append(str(Path().resolve()))
 
 from brs.fetch_utils import get_args, get_hyperparams
 from brs.fetcher import BrsFetcher
+from brs.preprocessing import Preprocessor
+from brs.labeling import Labeler
+#from brs.learning import Learner
 
 def main():
     start_time = datetime.now()
     print(f'Execution started at ', start_time)
+    
     # 1. preparations (parameters definition)
     args = get_args()
     hyperparams = get_hyperparams(Path('configs', args.hyperparams_path))
@@ -43,12 +47,30 @@ def main():
                              f"fetch_{hyperparams.fetch_date}", 'df.parquet'))
         
     # 3. preprocessing
+    if hyperparams.to_preprocess:  # run preprocess
+        preprocessor = Preprocessor(df, hyperparams)
+        df = preprocessor.preprocess()
+    else:  # load previously saved data
+        print(
+            f'The previously preprocessed data was loaded from the dataset dated {hyperparams.preprocessing.preprocess_date}')
+        df = pd.read_parquet(Path(hyperparams.output_dir, 'preprocessing',
+                                  f"preprocess_{hyperparams.preprocessing.preprocess_date}", 'df_preprocessed.parquet'))
 
     # 4. labeling
+    if hyperparams.labeling.to_label:  # run labeling
+        labeler = Labeler(df, hyperparams)
+        df = labeler.label()
+    else:  # load previously saved data
+        print(
+            f'The previously labeled data was loaded from the dataset dated {hyperparams.labeling.label_date}')
+
+        df = pd.read_pickle(Path(hyperparams.output_dir, 'labeling',
+                                 f"labeling_{hyperparams.labeling.label_date}", 'df_labeled.pickle'))
 
     # 5. learning
-
-    print(f'Execution ended at {datetime.now().strftime("%H:%M:%S")}, it took ', datetime.now() - start_time)
+    #learner = Learner(df, hyperparams)
+    #learner.learn()
+    #print(f'Execution ended at {datetime.now().strftime("%H:%M:%S")}, it took ', datetime.now() - start_time)
     return
 
 

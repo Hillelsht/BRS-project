@@ -8,7 +8,7 @@ import pandas as pd
 from pydantic import BaseModel, validator
 from pathlib import Path
 from brs.utils import read_yaml
-from typing import Any
+from typing import Any, List, Literal
 
 
 def get_args() -> argparse.Namespace:
@@ -22,6 +22,15 @@ def get_args() -> argparse.Namespace:
     return args
 
 
+
+
+class LabelingParams(BaseModel):
+
+    to_label: bool
+    label_date: str
+
+
+
 class Hyperparams(BaseModel):
     """
     This class defines the schema for hyperparameters using pydantic library
@@ -33,6 +42,9 @@ class Hyperparams(BaseModel):
     to_fetch: bool
     fetch_date: str
     historical_params: Any
+    to_preprocess: bool
+    features_list: list
+    labeling: LabelingParams
 
 
 def get_hyperparams(file_path: Path) -> Hyperparams:

@@ -3,15 +3,13 @@
 # Date: 05/09/2023
 ########################
 
-
-
-from pathlib import Path
 import yaml
 import json
 import pandas as pd
 import pickle
 
-
+from pathlib import Path
+from datetime import datetime
 
 def read_yaml(file_path: Path) -> dict:
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -53,3 +51,13 @@ def write_pickle(file_path: Path, model):
     """
     with open(file_path, 'wb') as file:
         pickle.dump(model, file)
+
+
+def print_time_decorator(func):
+    def wrapper(*args, **kwargs):
+        start_time = datetime.now()
+        print(f'{func.__module__}.{func.__name__} started at {start_time}')
+        result = func(*args, **kwargs)
+        print(f'{func.__module__}.{func.__name__} completed at {datetime.now().strftime("%H:%M:%S")}, it took {datetime.now() - start_time}')
+        return result
+    return wrapper
