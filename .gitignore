@@ -1,6 +1,6 @@
 # 
 .py
-data/
+#data/
 scripts/playground.py
 scripts/playground.ipynb
 auth.py
