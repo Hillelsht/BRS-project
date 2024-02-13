@@ -8,7 +8,7 @@ import pandas as pd
 from pydantic import BaseModel, validator
 from pathlib import Path
 from brs.utils import read_yaml
-from typing import Any, List, Literal
+from typing import Any, List, Literal, Optional
 
 
 def get_args() -> argparse.Namespace:
@@ -31,6 +31,14 @@ class LabelingParams(BaseModel):
 
 
 
+class LearningParams(BaseModel):
+    time_seperator: list
+    #imputer_type: Literal['MeanMedianImputer']
+    #imputation_method: Literal['mean', 'median']
+    #normalization_type: Literal['MinMaxScaler']
+    model_params: dict
+
+
 class Hyperparams(BaseModel):
     """
     This class defines the schema for hyperparameters using pydantic library
@@ -45,6 +53,7 @@ class Hyperparams(BaseModel):
     to_preprocess: bool
     features_list: list
     labeling: LabelingParams
+    learning: LearningParams
 
 
 def get_hyperparams(file_path: Path) -> Hyperparams:

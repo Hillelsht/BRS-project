@@ -15,7 +15,7 @@ from brs.fetch_utils import get_args, get_hyperparams
 from brs.fetcher import BrsFetcher
 from brs.preprocessing import Preprocessor
 from brs.labeling import Labeler
-#from brs.learning import Learner
+from brs.learning import Learner
 
 def main():
     start_time = datetime.now()
@@ -67,10 +67,16 @@ def main():
         df = pd.read_pickle(Path(hyperparams.output_dir, 'labeling',
                                  f"labeling_{hyperparams.labeling.label_date}", 'df_labeled.pickle'))
 
-    # 5. learning
-    #learner = Learner(df, hyperparams)
-    #learner.learn()
-    #print(f'Execution ended at {datetime.now().strftime("%H:%M:%S")}, it took ', datetime.now() - start_time)
+    # 5. learning Label_Price_Direction - Classification Problem
+    learner_direction = Learner(df, hyperparams, 'Label_Price_Direction')
+    learner_direction.learn()
+
+    # 6. learning Label_Future_Close - Regression Problem
+    learner_close = Learner(df, hyperparams, 'Label_Future_Close')
+    learner_close.learn()
+
+
+    print(f'Execution ended at {datetime.now().strftime("%H:%M:%S")}, it took ', datetime.now() - start_time)
     return
 
 
