@@ -50,6 +50,7 @@ def main():
     if hyperparams.to_preprocess:  # run preprocess
         preprocessor = Preprocessor(df, hyperparams)
         df = preprocessor.preprocess()
+        preprocessor.save_data(df)
     else:  # load previously saved data
         print(
             f'The previously preprocessed data was loaded from the dataset dated {hyperparams.preprocessing.preprocess_date}')
@@ -60,6 +61,7 @@ def main():
     if hyperparams.labeling.to_label:  # run labeling
         labeler = Labeler(df, hyperparams)
         df = labeler.label()
+        labeler.save_data(df)
     else:  # load previously saved data
         print(
             f'The previously labeled data was loaded from the dataset dated {hyperparams.labeling.label_date}')

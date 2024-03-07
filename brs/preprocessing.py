@@ -1,7 +1,8 @@
 import pandas as pd
 from brs.utils import write_json, read_json, print_time_decorator
 from brs.fetch_utils import Hyperparams
-
+from pathlib import Path
+from datetime import date
 
 class Preprocessor:
     """
@@ -10,6 +11,9 @@ class Preprocessor:
     def __init__(self, df: pd.DataFrame, hyperparams: Hyperparams)  -> None:
         self.df = df
         self.hyperparams = hyperparams
+        self.output_dir = Path(
+            hyperparams.output_dir, 'preprocess', f"preprocess_{date.today()}")
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
     def handle_missing_values_prep(self) -> None:
         """main method to clean the data
@@ -100,6 +104,11 @@ class Preprocessor:
         # Drop the outliers from the DataFrame
         self.df = self.df.drop(index=outlier_indices)
         print("W/o outliers DataFrame shape:", self.df.shape)
+
+    
+    def save_data(self, df: pd.DataFrame):
+        df.to_csv(Path(self.output_dir, 'df.csv'))
+        df.to_parquet(Path(self.output_dir, 'df.parquet'))
 
 
 

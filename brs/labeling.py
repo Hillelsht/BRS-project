@@ -1,7 +1,8 @@
 import pandas as pd
 from brs.utils import print_time_decorator
 from brs.fetch_utils import Hyperparams
-
+from pathlib import Path
+from datetime import date
 
 class Labeler:
     """
@@ -10,6 +11,10 @@ class Labeler:
     def __init__(self, df: pd.DataFrame, hyperparams: Hyperparams)  -> None:
         self.df = df
         self.hyperparams = hyperparams
+        # set output directory
+        self.output_dir = Path(
+            hyperparams.output_dir, 'label', f"label_{date.today()}")
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
     def create_labels(self) -> None:
         """
@@ -27,6 +32,9 @@ class Labeler:
         self.df = self.df[:-1]
 
 
+    def save_data(self, df: pd.DataFrame):
+        df.to_csv(Path(self.output_dir, 'df.csv'))
+        df.to_parquet(Path(self.output_dir, 'df.parquet'))
 
     @print_time_decorator
     def label(self)   -> pd.DataFrame:

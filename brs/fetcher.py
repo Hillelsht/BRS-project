@@ -1,6 +1,6 @@
 from typing import Type, List, Any, Union
 from pathlib import Path
-from datetime import datetime, date
+from datetime import date
 
 import pandas as pd
 

@@ -28,7 +28,7 @@ labeling:
 
 
 learning: # learning Label_Price_Direction - Classification Problem
-  time_seperator: ['2023-01-01', '2023-09-01', '2028-01-01'] #time separation between the datasets
+  time_seperator: ['2023-04-01', '2023-11-01', '2024-03-01'] #time separation between the datasets
   to_learn: True
   learning_date: '2024-02-08' # the date of running learning. Used to load data preprocessed within learning
   

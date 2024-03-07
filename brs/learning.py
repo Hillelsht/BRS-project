@@ -24,6 +24,7 @@ class Learner:
         self.label = label
         # Split df into Sets
         self.df = self.__split_data_to_sets(df)
+        self.__get_col_dtypes()
 
     def __split_data_to_sets(self, df: pd.DataFrame) -> pd.DataFrame:
         '''This function takes the dataframe resulting from the preprocessing and labeling
@@ -47,6 +48,46 @@ class Learner:
             self.hyperparams.learning.time_seperator[1], self.hyperparams.learning.time_seperator[2], inclusive='left'), 'SetType'] = 'test'
 
         return df
+    
+    
+    def __get_col_dtypes(self) -> None:
+        ''' generate separate lists of columns (boolean\numeric\time) based on their respective types
+        input: The df is self.df - The table consists of both the features and the labels, encompassing all the relevant information.
+        output: This function will generate separate lists of columns (boolean\numeric\time) based on their respective types.
+                The categorical columns ('Encrypted_CaseNum', 'Encrypted_PatNum', 'SetType', and 'label') were removed'''
+        
+        # Removing completely empty columns, relevant for the case, when multicenter run
+        self.df = self.df.dropna(axis=1, how='all')
+
+        # Get the most common data types for each column after removing NaN, because where there is
+        # a NaN and a value\string in a column the column type became object and not the real type.
+        # mode() - take the most common
+        cols_types = self.df.apply(
+            lambda x: x.dropna().apply(type).mode()[0])
+
+        self.cols_dtypes = {'bool': [],
+                            'numeric': [], 'time': [], 'str': []}
+        for col in self.df.columns:
+            if (cols_types[col] in [bool, np.bool_]) or (set(self.df[col].dropna().unique()) == {0, 1}):
+                # 1. If the column type is boolean add the column name to bool_list
+                self.cols_dtypes['bool'].append(col)
+
+            elif cols_types[col] in [np.floating, int, float]:
+                # 2. if the column is numeric add the column name to numeric_list
+                self.cols_dtypes['numeric'].append(col)
+
+            elif cols_types[col] in [datetime, pd.Timestamp, pd.Timedelta]:
+                # 3. if its a time column, add the column name to time_list
+                # As 'Encounter.period.start' will be omitted during the learning process, we've distinguished it from the 'time_cols_list'.
+                if col not in ['Encounter.period.start']:
+                    self.cols_dtypes['time'].append(col)
+
+            elif cols_types[col] in [str]:
+                self.cols_dtypes['str'].append(col)
+
+            else:
+                raise ValueError(
+                    f"Check whether the current column type is expected to be present.: {col} type: {cols_types[col]}")
 
 
     def split_df_to_features_and_label(self, df) -> tuple:
@@ -196,13 +237,13 @@ class Learner:
         '''
         # Import the module and get the model class.
         module = importlib.import_module(model_params['module_path'])
-        model_classifier = getattr(module, model_params['model_classifier'])
+        model_classifier = getattr(module, model_params['model_type'])
 
         # Instantiate the model with the training parameters.
         model = model_classifier(**model_params['train_params'])
 
         # train training data
-        model.fit(x_train.values, y_train.values.astype(int).ravel(),
+        model.fit(x_train.values, y_train[self.label].values.astype(int).ravel(),
                 **model_params['fit_params'])
         return model
     
