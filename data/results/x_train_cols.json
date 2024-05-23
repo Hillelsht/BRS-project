@@ -1,0 +1,17 @@
+[
+  "Open",
+  "High",
+  "Low",
+  "Close",
+  "Volume",
+  "Dividends",
+  "Stock Splits",
+  "Capital Gains",
+  "day_of_week",
+  "month",
+  "hour",
+  "MA_5",
+  "MA_10",
+  "Close_pct_change",
+  "Volume_pct_change"
+]

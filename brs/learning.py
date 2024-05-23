@@ -98,10 +98,9 @@ class Learner:
                 y_df - a dataframe exclusively consisting of label columns, devoid of any feature columns'''
 
         # remove all columns that start with 'Label_' - naming convention, labels start with 'Label_'
+        df.set_index(['Instrument','Datetime', 'Market'], inplace=True)
         x_df = df.loc[:, ~df.columns.str.startswith('Label_')]
-
-        y_df = df[["Datetime",
-                "Instrument", "Market", self.label]].copy()
+        y_df = df[[self.label]].copy()
 
         return x_df, y_df
     
@@ -210,7 +209,7 @@ class Learner:
             y_pred = model.predict(x_df.values)
 
             results_dict[model_name] = self.calc_model_results(
-                model_name, y_df.values, y_pred, y_prob, set_type, self.output_dir)
+                model_name, y_df.values, y_pred, y_prob, set_type, self.hyperparams.output_dir)
 
         # Aggregate the validation/test results from all models into a unified dataframe
         results_df = pd.concat(
@@ -295,6 +294,7 @@ class Learner:
 
         # train models
         models = {'ml': {}}
+        x_train.drop(columns=['SetType'], inplace=True)
         models['ml'] = self.train_models(x_train, y_train)
 
         train_results_df = self.evaluate_models(
@@ -303,7 +303,7 @@ class Learner:
         # 2. process validation data
         x_valid, y_valid = self.split_df_to_features_and_label(
             self.df.loc[self.df.SetType == 'val'])
-
+        x_valid.drop(columns=['SetType'], inplace=True)
         # get validation results
         valid_results_df = self.evaluate_models(
             x_valid, y_valid, models['ml'], 'valid')
@@ -311,7 +311,7 @@ class Learner:
         # 3. process test data
         x_test, y_test = self.split_df_to_features_and_label(
             self.df.loc[self.df.SetType == 'test'])
-
+        x_test.drop(columns=['SetType'], inplace=True)
         # get test results
         test_results_df = self.evaluate_models(
             x_test, y_test, models['ml'], 'test')
@@ -321,7 +321,7 @@ class Learner:
 
         # 4. Save all the results, including models, metrics, and graphs
         self.save_learning_results(models, x_train, y_train,
-                              x_valid, y_valid, x_test, y_test, results_df, self.output_dir)
+                              x_valid, y_valid, x_test, y_test, results_df, self.hyperparams.output_dir)
 
 
 

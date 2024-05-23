@@ -39,6 +39,11 @@ class LearningParams(BaseModel):
     model_params: dict
 
 
+class PreprocessingParams(BaseModel):
+    to_preprocess: bool
+    preprocess_date: str
+
+
 class Hyperparams(BaseModel):
     """
     This class defines the schema for hyperparameters using pydantic library
@@ -50,7 +55,7 @@ class Hyperparams(BaseModel):
     to_fetch: bool
     fetch_date: str
     historical_params: Any
-    to_preprocess: bool
+    preprocessing: PreprocessingParams
     features_list: list
     labeling: LabelingParams
     learning: LearningParams

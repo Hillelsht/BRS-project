@@ -36,7 +36,7 @@ def main():
         fetcher_historical.save_data(df)
         
         # Fetch real-time data (online fetcher is temporary unavailable due to API provider issues)
-        fetcher_real_time = BrsFetcher(hyperparams, data_type="real_time")
+        #fetcher_real_time = BrsFetcher(hyperparams, data_type="real_time")
         #df_real_time = fetcher_real_time.fetch_data()
         #fetcher_historical.save_data(df_real_time)
 
@@ -47,15 +47,15 @@ def main():
                              f"fetch_{hyperparams.fetch_date}", 'df.parquet'))
         
     # 3. preprocessing
-    if hyperparams.to_preprocess:  # run preprocess
+    if hyperparams.preprocessing.to_preprocess:  # run preprocess
         preprocessor = Preprocessor(df, hyperparams)
         df = preprocessor.preprocess()
         preprocessor.save_data(df)
     else:  # load previously saved data
         print(
             f'The previously preprocessed data was loaded from the dataset dated {hyperparams.preprocessing.preprocess_date}')
-        df = pd.read_parquet(Path(hyperparams.output_dir, 'preprocessing',
-                                  f"preprocess_{hyperparams.preprocessing.preprocess_date}", 'df_preprocessed.parquet'))
+        df = pd.read_parquet(Path(hyperparams.output_dir, 'preprocess',
+                                  f"preprocess_{hyperparams.preprocessing.preprocess_date}", 'df.parquet'))
 
     # 4. labeling
     if hyperparams.labeling.to_label:  # run labeling
@@ -66,16 +66,16 @@ def main():
         print(
             f'The previously labeled data was loaded from the dataset dated {hyperparams.labeling.label_date}')
 
-        df = pd.read_pickle(Path(hyperparams.output_dir, 'labeling',
-                                 f"labeling_{hyperparams.labeling.label_date}", 'df_labeled.pickle'))
+        df = pd.read_parquet(Path(hyperparams.output_dir, 'label',
+                                 f"label_{hyperparams.labeling.label_date}", 'df.parquet'))
 
     # 5. learning Label_Price_Direction - Classification Problem
     learner_direction = Learner(df, hyperparams, 'Label_Price_Direction')
     learner_direction.learn()
 
     # 6. learning Label_Future_Close - Regression Problem
-    learner_close = Learner(df, hyperparams, 'Label_Future_Close')
-    learner_close.learn()
+    #learner_close = Learner(df, hyperparams, 'Label_Future_Close')
+    #learner_close.learn()
 
 
     print(f'Execution ended at {datetime.now().strftime("%H:%M:%S")}, it took ', datetime.now() - start_time)

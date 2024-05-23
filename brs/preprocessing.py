@@ -3,6 +3,7 @@ from brs.utils import write_json, read_json, print_time_decorator
 from brs.fetch_utils import Hyperparams
 from pathlib import Path
 from datetime import date
+from sklearn.preprocessing import LabelEncoder
 
 class Preprocessor:
     """
@@ -14,6 +15,8 @@ class Preprocessor:
         self.output_dir = Path(
             hyperparams.output_dir, 'preprocess', f"preprocess_{date.today()}")
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+        self.numerical_cols = self.df.select_dtypes(include=['float64', 'int64']).columns
+        self.categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns
 
     def handle_missing_values_prep(self) -> None:
         """main method to clean the data
@@ -26,19 +29,16 @@ class Preprocessor:
         # Impute missing values
 
         # Handle missing values for the numerical columns
-        numerical_cols = self.df.select_dtypes(include=['float64', 'int64']).columns
         # TODO check what imputation method is the best for the performance: impute zeros, leave empty values, ffil or mean
         # try mean for the missing numeric values
         # self.df[numerical_cols] = self.df[numerical_cols].fillna(self.df[numerical_cols].mean())
         # try ffil for the missing numeric values
         # self.df[numerical_cols] = self.df[numerical_cols].fillna(method='ffill')
         # try zeros for the missing numeric values
-        self.df[numerical_cols] = self.df[numerical_cols].fillna(0)
-
+        self.df[self.numerical_cols] = self.df[self.numerical_cols].fillna(0)
 
         # For categorical columns, you might replace missing values with the mode
-        categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns
-        self.df[categorical_cols] = self.df[categorical_cols].fillna(self.df[categorical_cols].mode().iloc[0])
+        self.df[self.categorical_cols] = self.df[self.categorical_cols].fillna(self.df[self.categorical_cols].mode().iloc[0])
 
         # Verify if there are any missing values left
         missing_values_after = self.df.isnull().sum()
@@ -48,8 +48,12 @@ class Preprocessor:
 
     def format_data_prep(self) -> None:
         """main method to format the data"""
-        # process datatime columns
+        # process datetime columns
         self.df['Datetime'] = pd.to_datetime(self.df['Datetime'], utc=True).dt.tz_convert('America/New_York')
+        # process categorical columns
+        for col in self.df.select_dtypes(include=['object', 'category']).columns:
+            self.df[col] = LabelEncoder().fit_transform(self.df[col])
+
 
 
     def engineer_features_prep(self) -> None:
